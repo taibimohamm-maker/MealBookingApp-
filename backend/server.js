@@ -3,6 +3,10 @@ const User = require("./models/User");
 const Reservation = require("./models/Reservation");
 const mongoose = require('mongoose');
 const authRoutes = require("./routes/auth");
+const reservationRoutes = require("./routes/reservations");
+const paymentRoutes = require("./routes/payment");
+const reservationRoutes = require("./routes/reservations");
+const paymentRoutes = require("./routes/payment");
 const authRoutes = require("./routes/auth");
 const authRoutes = require("./routes/auth");
 const cors = require('cors');
@@ -11,6 +15,8 @@ require('dotenv').config();
 const app = express();
 app.use(cors());  // Permet les requêtes du frontend
 app.use(express.json());  // Parse les données JSON
+app.use("/api/reservations", reservationRoutes);
+app.use("/api/payment", paymentRoutes);
 
 app.use("/api/auth", authRoutes);
 // Connexion à MongoDB (options supprimées car dépréciées)
