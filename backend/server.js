@@ -1,4 +1,6 @@
 const express = require('express');
+const User = require("./models/User");
+const Reservation = require("./models/Reservation");
 const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
