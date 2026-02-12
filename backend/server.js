@@ -1,32 +1,45 @@
 const express = require('express');
-const User = require("./models/User");
-const Reservation = require("./models/Reservation");
 const mongoose = require('mongoose');
-const authRoutes = require("./routes/auth");
-const reservationRoutes = require("./routes/reservations");
-const paymentRoutes = require("./routes/payment");
-const reservationRoutes = require("./routes/reservations");
-const paymentRoutes = require("./routes/payment");
-const authRoutes = require("./routes/auth");
-const authRoutes = require("./routes/auth");
 const cors = require('cors');
 require('dotenv').config();
 
-const app = express();
-app.use(cors());  // Permet les requêtes du frontend
-app.use(express.json());  // Parse les données JSON
-app.use("/api/reservations", reservationRoutes);
-app.use("/api/payment", paymentRoutes);
+const authRoutes = require("./routes/auth");
+const reservationRoutes = require("./routes/reservations");
+const paymentRoutes = require("./routes/payment");
+const mealRoutes = require("./routes/meals"); // Import des routes meals
 
-app.use("/api/auth", authRoutes);
-// Connexion à MongoDB (options supprimées car dépréciées)
+const app = express();
+
+// Middleware
+app.use(cors());
+app.use(express.json()); // Pour parser le JSON
+
+// Connexion MongoDB
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log('MongoDB connecté'))
-  .catch(err => console.error('Erreur MongoDB:', err));
+  .catch(err => {
+    console.error('Erreur MongoDB:', err);
+    process.exit(1); // Arrêter le serveur en cas d'erreur
+  });
 
-// Endpoint de test
+// Route de test
 app.get('/', (req, res) => res.json({ message: 'Backend de MealBookingApp fonctionne !' }));
 
-// Port d'écoute
+// Routes API
+app.use("/api/auth", authRoutes);
+app.use("/api/reservations", reservationRoutes);
+app.use("/api/payment", paymentRoutes);
+app.use("/api/meals", mealRoutes); // Ajout des routes meals
+
+// Gestion des erreurs globales
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: 'Erreur interne du serveur' });
+});
+
+// Démarrage du serveur
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Serveur en cours sur le port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Serveur en cours sur le port ${PORT}`);
+  console.log('Routes disponibles : /api/auth, /api/reservations, /api/payment, /api/meals');
+});
