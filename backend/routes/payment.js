@@ -5,7 +5,6 @@ const Reservation = require('../models/Reservation');
 
 const router = express.Router();
 
-// Middleware pour vérifier le token JWT
 const authenticate = (req, res, next) => {
   const token = req.header('Authorization')?.replace('Bearer ', '');
   if (!token) return res.status(401).json({ error: 'Accès refusé' });
@@ -17,7 +16,6 @@ const authenticate = (req, res, next) => {
   }
 };
 
-// Créer un PaymentIntent pour une réservation
 router.post('/create-payment-intent', authenticate, async (req, res) => {
   try {
     const { reservationId } = req.body;
@@ -26,7 +24,7 @@ router.post('/create-payment-intent', authenticate, async (req, res) => {
       return res.status(403).json({ error: 'Réservation non trouvée ou accès refusé' });
     }
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: reservation.price * 100,  // Stripe utilise les centimes
+      amount: reservation.price * 100,
       currency: 'eur',
       metadata: { reservationId: reservation._id.toString() }
     });

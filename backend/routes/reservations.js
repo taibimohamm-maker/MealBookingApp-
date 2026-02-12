@@ -1,11 +1,9 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const Reservation = require('../models/Reservation');
-const User = require('../models/User');
 
 const router = express.Router();
 
-// Middleware pour vérifier le token JWT
 const authenticate = (req, res, next) => {
   const token = req.header('Authorization')?.replace('Bearer ', '');
   if (!token) return res.status(401).json({ error: 'Accès refusé' });
@@ -17,7 +15,6 @@ const authenticate = (req, res, next) => {
   }
 };
 
-// Créer une réservation
 router.post('/', authenticate, async (req, res) => {
   try {
     const { hostId, date, meal, price } = req.body;
@@ -35,7 +32,6 @@ router.post('/', authenticate, async (req, res) => {
   }
 });
 
-// Lister les réservations de l'utilisateur
 router.get('/', authenticate, async (req, res) => {
   try {
     const reservations = await Reservation.find({

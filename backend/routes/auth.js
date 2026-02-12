@@ -5,7 +5,19 @@ const User = require('../models/User');
 
 const router = express.Router();
 
-// Route d'inscription
+// Middleware pour vérifier le token JWT
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  if (!token) return res.status(401).json({ error: 'Token manquant' });
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    if (err) return res.status(403).json({ error: 'Token invalide' });
+    req.user = user;
+    next();
+  });
+};
+
 router.post('/register', async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
@@ -18,7 +30,6 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// Route de connexion
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -30,6 +41,17 @@ router.post('/login', async (req, res) => {
     res.json({ token, user: { id: user._id, name: user.name, role: user.role } });
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+});
+
+router.put('/profile', authenticateToken, async (req, res) => {
+  try {
+    const { allergies, dietPreferences, location, budgetRange, favoriteCuisines } = req.body;
+    const user = await User.findByIdAndUpdate(req.user.id, { allergies, dietPreferences, location, budgetRange, favoriteCuisines }, { new: true });
+    if (!user) return res.status(404).json({ error: 'Utilisateur non trouvé' });
+    res.json({ message: 'Profil mis à jour', user });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
   }
 });
 

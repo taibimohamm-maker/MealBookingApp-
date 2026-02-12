@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "caf0a019-32d1-41ac-9136-d0f58aac9613"
+      }
+    },
+    "android": {
+      "package": "com.taibi.mohamm.backend"
+    }
+  }
+}
